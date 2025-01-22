@@ -42,7 +42,6 @@ app.post("/signin", function(req, res){
     console.log(users)
 })
 
-
 function auth(req, res, next){
     const token = req.headers.token;
 
@@ -64,7 +63,6 @@ function auth(req, res, next){
     }    
 }
 
-
 app.get("/me", auth, function(req, res){
     let foundUser = users.find(user => user.username === req.username);
 
@@ -77,5 +75,8 @@ app.get("/me", auth, function(req, res){
         res.json({ msg: "Invalid token"});
     }
 })
+
+
+
 
 app.listen(3000);

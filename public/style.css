@@ -1,0 +1,55 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.auth-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  width: 100vw;
+}
+
+.credentials{
+    border: 2px solid;
+    height: 50%;
+    width: 25%;
+    padding: 2.5rem;
+    font-size: 1.2rem;
+    border-radius: 30px;
+    box-shadow:3px 6px 5px purple inset, 
+    10px 5px 5px red;
+}
+
+.credentials h2 {
+    text-align: center;
+    margin-bottom: 1rem;
+    box-shadow: 10px 5px 5px red;
+    border-radius:10px;
+}
+
+.credentials button{
+    text-align: center;
+    font-size: 1.2rem;
+    padding: 3% 34%;
+    border-radius: 10px;
+    box-shadow: 10px 5px 5px red;
+}
+
+.credentials h2, input, button {
+    margin-bottom: 1rem;
+}
+
+.credentials input {
+    border: none;
+    border-bottom: 2px solid gray;
+    color: white;
+    width: 90%;    
+}
+
+.form-content::placeholder {
+color: transparent;
+}
+
