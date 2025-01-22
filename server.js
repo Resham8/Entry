@@ -43,5 +43,39 @@ app.post("/signin", function(req, res){
 })
 
 
+function auth(req, res, next){
+    const token = req.headers.token;
+
+    if(!token){
+        res.json({
+            msg:"Invalid token"
+        })
+    }
+
+    const decodedData = jwt.verify(token, process.env.JWT_SECRETE);
+
+    if(decodedData.username){
+        req.username = decodedData.username;
+        next();
+    } else {
+        res.json({
+            msg: "You are not logged in"
+        })
+    }    
+}
+
+
+app.get("/me", auth, function(req, res){
+    let foundUser = users.find(user => user.username === req.username);
+
+    if(foundUser){
+        res.json({
+            username : foundUser.username,
+            password : foundUser.password
+        });
+    } else {
+        res.json({ msg: "Invalid token"});
+    }
+})
 
 app.listen(3000);
