@@ -1,55 +1,107 @@
+:root {
+  --primary-shadow: purple;
+  --secondary-shadow: red;
+  --border-color: #333;
+  --error-color: #dc3545;
+}
+
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, system-ui, sans-serif;
 }
 
 .auth-container {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
-  width: 100vw;
+  min-height: 100vh;
+  padding: 1rem;
 }
 
-.credentials{
-    border: 2px solid;
-    height: 50%;
-    width: 25%;
-    padding: 2.5rem;
-    font-size: 1.2rem;
-    border-radius: 30px;
-    box-shadow:3px 6px 5px purple inset, 
-    10px 5px 5px red;
+.credentials {
+  border: 2px solid var(--border-color);
+  width: min(90%, 400px);
+  padding: 2.5rem;
+  font-size: 1.2rem;
+  border-radius: 30px;
+  box-shadow: -5px -5px 5px var(--primary-shadow),
+    5px 5px 5px var(--secondary-shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
 
 .credentials h2 {
-    text-align: center;
-    margin-bottom: 1rem;
-    box-shadow: 10px 5px 5px red;
-    border-radius:10px;
+  text-align: center;
+  padding: 0.5rem;
+  border-radius: 10px;
+  box-shadow: -5px -5px 5px var(--primary-shadow),
+    5px 5px 5px var(--secondary-shadow);
 }
 
-.credentials button{
-    text-align: center;
-    font-size: 1.2rem;
-    padding: 3% 34%;
-    border-radius: 10px;
-    box-shadow: 10px 5px 5px red;
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
-.credentials h2, input, button {
-    margin-bottom: 1rem;
+.form-input {
+  width: 100%;
+  padding: 0.5rem 0;
+  border: none;
+  border-bottom: 2px solid gray;
+  font-size: inherit;
+  transition: border-color 0.3s ease;
 }
 
-.credentials input {
-    border: none;
-    border-bottom: 2px solid gray;
-    color: white;
-    width: 90%;    
+.form-input:focus {
+  outline: none;
+  border-color: var(--primary-shadow);
 }
 
-.form-content::placeholder {
-color: transparent;
+.submit-btn {
+  width: 100%;
+  padding: 0.75rem;
+  font-size: 1.2rem;
+  border: none;
+  border-radius: 10px;
+  background-color: white;
+  box-shadow: -5px -6px 5px var(--primary-shadow),
+    5px 6px 5px var(--secondary-shadow);
+  cursor: pointer;
+  transition: transform 0.2s ease;
 }
 
+.submit-btn:hover {
+  transform: translateY(-2px);
+}
+
+.submit-btn:active {
+  transform: translateY(1px);
+}
+
+.error-message {
+  color: var(--error-color);
+  font-size: 0.875rem;
+  display: none;
+}
+
+.error-message.visible {
+  display: block;
+}
+
+.form-input.error {
+  border-color: var(--error-color);
+}
+
+@media (max-width: 480px) {
+  .credentials {
+    padding: 1.5rem;
+    font-size: 1rem;
+  }
+}
