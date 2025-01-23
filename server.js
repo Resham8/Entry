@@ -20,7 +20,7 @@ app.post("/signup", function(req, res){
     })
 
     res.json({
-        msg:"You have signed up"
+        msg:"You have signed up"    
     })
 })
 
@@ -66,6 +66,7 @@ function auth(req, res, next){
         })
     }    
 }
+
 
 app.get("/me", auth, function(req, res){
     let foundUser = users.find(user => user.username === req.username);

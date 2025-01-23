@@ -1,18 +1,12 @@
-const url = "http://localhost:3000";
+function addNote(){
+    const wrapper = document.getElementsByClassName("wrapper");
+    const note = document.createElement("div");
+    note.setAttribute("class","note")
+    const note_textarea = document.createElement("textarea");
+    note_textarea.setAttribute("id","note-input");
+    note.appendChild(note_textarea);
+    wrapper.appendChild(note);
 
-function sendSingUpRequest() {
-  const username = document.getElementById("username").value;
-  const password = document.getElementById("password").value;
-
-  axios
-    .post(`${url}/signup`, {
-      username: username,
-      password: password,
-    })
-    .then(function (response) {
-      console.log(response.data);
-    })
-    .catch(function (error) {
-      console.log(error);
-    });
+    const note_text = document.getElementById("note-input").value;
+    console.log(note_text);
 }
