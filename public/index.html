@@ -1,11 +1,104 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Note Taking App</title>
-</head>
-<body>
-    
-</body>
+    <link rel="stylesheet" href="style.css" />    
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"
+    />
+
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+  </head>
+  <body>
+    <div class="landing-container">
+      <div class="nav">
+        <div class="logo"><h1>Entry.</h1></div>
+        <div class="nav-buttons">
+          <button>Sign Up</button>
+          <button>Sign In</button>
+        </div>
+      </div>
+      <div class="hero-section">
+        <h1>Streamline your thoughts. Stay organized.</h1>
+        <p>
+          With Entry, note-taking has never been easier. Whether you're jotting
+          down quick ideas, tracking to-dos, or capturing important information,
+          Entry keeps it all simple, clean, and accessible.
+        </p>
+        <a href="register.html">
+          <button>Get Started</button>
+        </a>
+      </div>
+      
+        <div class="carousel-container">
+          <div class="swiper">
+            <div class="swiper-wrapper">
+              <div class="swiper-slide">
+                <div class="card">
+                  <h3>Card 1</h3>
+                  <p>Content for card 1</p>
+                </div>
+              </div>
+              <div class="swiper-slide">
+                <div class="card">
+                  <h3>Card 2</h3>
+                  <p>Content for card 2</p>
+                </div>
+              </div>
+              <div class="swiper-slide">
+                <div class="card">
+                  <h3>Card 3</h3>
+                  <p>Content for card 3</p>
+                </div>
+              </div>
+              <div class="swiper-slide">
+                <div class="card">
+                  <h3>Card 4</h3>
+                  <p>Content for card 4</p>
+                </div>
+              </div>
+              <div class="swiper-slide">
+                <div class="card">
+                  <h3>Card 5</h3>
+                  <p>Content for card 5</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      
+    </div>
+
+    <script>
+      const swiper = new Swiper(".swiper", {
+        effect: "coverflow",
+        grabCursor: true,
+        centeredSlides: true,
+        slidesPerView: 3,
+        loop: true,
+        spaceBetween: 30, 
+        coverflowEffect: {
+          rotate: 0,
+          stretch: 100,
+          depth: 150,
+          modifier: 1.5,
+          slideShadows: false,
+        },
+        pagination: {
+          el: ".swiper-pagination",
+        },
+        breakpoints: {    // responsiveness      
+          768: {
+            slidesPerView: 3,
+          },
+          480: {
+            slidesPerView: 1,
+          },
+        },
+      });
+    </script>
+  </body>
 </html>
