@@ -47,6 +47,11 @@ function addNote() {
   })
 }
 
+function saveData(textData){
+    // local storage to store username,
+    // get data from backend 
+}
+
 function editNote(){
     alert('Edit Note clicked!');
 }

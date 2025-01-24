@@ -11,6 +11,21 @@ app.use(cors());
 
 const dataPath = path.join(__dirname, '../data.json');
 
+async function readData() {
+    try {
+        const data = await fs.readFile(dataPath, 'utf8');
+        return JSON.parse(data);
+    } catch (error) {
+        console.error(error);
+        return { users: [], notes: [] };
+    }
+}
+
+async function writeData(data) {
+    await fs.writeFile(dataPath, JSON.stringify(data, null, 2));
+}
+
+users = []
 
 app.post("/signup", function(req, res){
     const username = req.body.username;
@@ -83,6 +98,36 @@ app.get("/me", auth, function(req, res){
     }
 })
 
+
+app.post("/notes", auth, function(req, res){
+    const notesData = req.body.notesData;
+    idCounter = Math.max(0, ...goals.map((g) => g.id)) + 1;
+    const username = req.body.username;
+
+    const newNotes = {
+        id : idCounter,
+        username : username,
+        notesData : notesData
+    }
+
+   if(writeData(newNotes)){
+     res.status(201).json({ id: newNotes.id });
+   } else {
+    res.status(500).json({
+        msg: "error while saving note"
+    })
+   }
+
+})
+
+app.get("/notes", auth, function(req, res){
+    const data = readData();
+    if(data.length > 0){
+        res.json(data);
+    } else {
+        res.status(204).json({ msg: "List is empty" });
+    }
+})
 
 
 
