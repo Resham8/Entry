@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="style.css" />
     <script src="main.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
   </head>
   <body>
     <div class="dash-container">
@@ -14,14 +15,17 @@
         <div class="logo"><h1>Entry.</h1></div>
         <div class="user-info"></div>
       </div>
-      <div class="wrapper">
+      <div class="wrapper">        
         <div class="note">
-          <!-- <p class="note-text">text text</p> -->
-          <textarea name="notes" id="note-input"></textarea>
-        </div>
+          <div class="note-icons">
+              <i class="fa-solid fa-pen-to-square" title="Edit Note"></i>
+              <i class="fa-solid fa-trash" title="Delete Note"></i>
+          </div>
+          <textarea name="notes" id="note-input" class="note-input" placeholder="Type your note here..."></textarea>
+      </div>
         <div class="note-add">
           <button onclick="addNote()">+</button>
-        </div>
+        </div>        
       </div>
     </div>
   </body>

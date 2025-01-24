@@ -1,5 +1,6 @@
 const express = require("express");
 const jwt = require("jsonwebtoken");
+const fs = require("fs");
 require('dotenv').config();
 const cors = require("cors");
 
@@ -8,7 +9,8 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-const users = [];
+const dataPath = path.join(__dirname, '../data.json');
+
 
 app.post("/signup", function(req, res){
     const username = req.body.username;
