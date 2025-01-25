@@ -1,3 +1,24 @@
+const url = "http://localhost:3000";
+
+const token = localStorage.getItem("token");
+const username = localStorage.getItem("username");
+
+if(!token){
+  alert("You must sign in first!");
+  window.location.href = "index.html";
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+  function addUser(username) {
+    const userInfo = document.getElementById("user-info");
+    const pEle = document.createElement("p");  
+    pEle.innerText = `${username}`;
+    userInfo.appendChild(pEle);
+  }
+  
+  addUser(username);
+});
+
 function addNote() {
   const wrapper = document.querySelector(".wrapper");
   const note = document.createElement("div");

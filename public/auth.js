@@ -30,7 +30,7 @@ function authentication() {
   if (isSignUp) {
     sendSingUpRequest(username, password);
   } else {
-    sendSingInRequest(username, password);
+    sendSignInRequest(username, password);
   }
 }
 
@@ -48,13 +48,25 @@ function sendSingUpRequest(username, password) {
     });
 }
 
-async function sendSingInRequest(username, password) {
-  const response = await axios.post(`${url}/signin`, {
-    username: username,
-    password: password,
-  });
+async function sendSignInRequest(username, password) {
+  try {
+    const response = await axios.post(`${url}/signin`, {
+      username: username,
+      password: password,
+    });
+    
+    localStorage.setItem("token", response.data.token);
+    localStorage.setItem("username", username);
+    
+    console.log("Saved token:", localStorage.getItem("token"));
+    console.log("Saved username:", localStorage.getItem("username"));
 
-  localStorage.setItem("token", response.data.token);
-
-  alert("Signed in successfully");
+    // Redirect to dashboard
+    window.location.href = "dashboard.html";
+  } catch (error) {
+    console.error(error);
+    alert("Sign-in failed. Please check your credentials.");
+  }
 }
+
+

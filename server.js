@@ -54,6 +54,7 @@ app.post("/signin", function(req, res){
         },process.env.JWT_SECRETE);
 
         res.json({
+            username: username,
             token : token
         })                
     } else {

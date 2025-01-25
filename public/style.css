@@ -308,6 +308,15 @@ body {
   margin: 2rem;
 }
 
+.user-info{
+  text-align: center;
+  width: 10vw;  
+}
+
+.user-info p {
+  color: black;
+  font-size: 1.5rem;
+}
 
 @media (max-width: 480px) {
   .credentials {
