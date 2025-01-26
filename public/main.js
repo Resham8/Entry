@@ -13,11 +13,22 @@ document.addEventListener('DOMContentLoaded', function () {
     const userInfo = document.getElementById("user-info");
     const pEle = document.createElement("p");  
     pEle.innerText = `${username}`;
+
+    const logoutBtn = document.createElement("button");
+    logoutBtn.textContent = "Log-Out";
+    logoutBtn.addEventListener("click",logout());
     userInfo.appendChild(pEle);
+    userInfo.appendChild(logoutBtn);
   }
   
   addUser(username);
 });
+
+
+async function logout() {
+    localStorage.removeItem("token");
+}
+
 
 function addNote() {
   const wrapper = document.querySelector(".wrapper");
