@@ -3,32 +3,31 @@ const url = "http://localhost:3000";
 const token = localStorage.getItem("token");
 const username = localStorage.getItem("username");
 
-if(!token){
+if (!token) {
   alert("You must sign in first!");
   window.location.href = "index.html";
 }
 
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener("DOMContentLoaded", function () {
   function addUser(username) {
     const userInfo = document.getElementById("user-info");
-    const pEle = document.createElement("p");  
+    const pEle = document.createElement("p");
     pEle.innerText = `${username}`;
 
     const logoutBtn = document.createElement("button");
     logoutBtn.textContent = "Log-Out";
-    logoutBtn.addEventListener("click",logout());
+    logoutBtn.addEventListener("click", logout());
+    logoutBtn.setAttribute("class", "log-out");
     userInfo.appendChild(pEle);
     userInfo.appendChild(logoutBtn);
   }
-  
+
   addUser(username);
 });
 
-
 async function logout() {
-    localStorage.removeItem("token");
+  localStorage.removeItem("token");
 }
-
 
 function addNote() {
   const wrapper = document.querySelector(".wrapper");
@@ -43,52 +42,90 @@ function addNote() {
   const penIcon = document.createElement("i");
   penIcon.classList.add("fa-solid", "fa-pen-to-square");
   penIcon.setAttribute("title", "Edit Note");
-  
+
   const trashIcon = document.createElement("i");
   trashIcon.classList.add("fa-solid", "fa-trash");
   trashIcon.setAttribute("title", "Delete Note");
 
   note_icon.appendChild(penIcon);
   note_icon.appendChild(trashIcon);
-  
+
   note.appendChild(note_icon);
 
   const note_textarea = document.createElement("textarea");
   note_textarea.setAttribute("id", "note-input");
-  note_textarea.setAttribute("class","note-input");
-  note_textarea.setAttribute("placeholder","Type your note here...")
+  note_textarea.setAttribute("class", "note-input");
+  note_textarea.setAttribute("placeholder", "Type your note here...");
 
   note.appendChild(note_textarea);
   wrapper.insertBefore(note, note_add_div);
-
+  
   note_textarea.addEventListener("mouseleave", () => {
     const textValue = note_textarea.value;
     console.log(textValue);
     const textP = document.createElement("p");
     note.appendChild(textP);
     textP.innerText = textValue;
-    note_textarea.remove();
+
+    saveData(textValue);
+
+    note_textarea.remove(); 
   });
 
-  penIcon.addEventListener('click', function() {
+  penIcon.addEventListener("click", function () {
     editNote();
   });
 
-  trashIcon.addEventListener('click',function(){
+  trashIcon.addEventListener("click", function () {
     deleteNote();
-  })
+  });
 }
 
-function saveData(textData){
-    // local storage to store username,
-    // get data from backend 
+
+async function saveData(textData) {
+  const token = localStorage.getItem("token");
+  console.log("Token from localStorage:", token); // debug token
+
+  if (!token) {
+    alert("Token is missing. Please log in again.");
+    return;
+  }
+
+  const noteInput = document.querySelector(".note-input");
+  if (!noteInput) {
+    alert("Note input not found!");
+    return;
+  }
+
+  const noteContent = noteInput.value;
+
+  try {
+    const response = await axios.post(
+      `${url}/notes`,
+      {
+        username: localStorage.getItem("username"),
+        notesData: noteContent,
+      },
+      {
+        headers: {
+          token: token,
+        },
+      }
+    );
+
+    console.log("Response from server:", response.data);
+  } catch (error) {
+    console.error("Error saving note:", error.response?.data || error.message);
+    alert("Error saving note. Please check the token or contact support.");
+  }
 }
 
-function editNote(){
-    alert('Edit Note clicked!');
+
+
+function editNote() {
+  alert("Edit Note clicked!");
 }
 
 function deleteNote() {
-    alert('delete ');
+  alert("delete ");
 }
-

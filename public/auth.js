@@ -36,7 +36,7 @@ function authentication() {
 
 function sendSingUpRequest(username, password) {
   axios
-    .post(`${url}/${isSignUp ? "signup" : "signin"}`, {
+    .post(`${url}/signup`, {
       username: username,
       password: password,
     })
@@ -49,24 +49,23 @@ function sendSingUpRequest(username, password) {
 }
 
 async function sendSignInRequest(username, password) {
-  try {
-    const response = await axios.post(`${url}/signin`, {
+  axios
+    .post("http://localhost:3000/signin", {
       username: username,
       password: password,
+    })
+    .then((response) => {
+      console.log(response.data);
+      localStorage.setItem("token", response.data.token);
+      localStorage.setItem("username", response.data.username);
+      console.log("Token and username stored successfully!");
+      window.location.href = "dashboard.html";
+    })
+    .catch((error) => {
+      console.error(
+        "Error during login:",
+        error.response?.data || error.message
+      );
+      alert("Login failed. Please check your credentials.");
     });
-    
-    localStorage.setItem("token", response.data.token);
-    localStorage.setItem("username", username);
-    
-    console.log("Saved token:", localStorage.getItem("token"));
-    console.log("Saved username:", localStorage.getItem("username"));
-
-    // Redirect to dashboard
-    window.location.href = "dashboard.html";
-  } catch (error) {
-    console.error(error);
-    alert("Sign-in failed. Please check your credentials.");
-  }
 }
-
-
