@@ -1,8 +1,8 @@
 const express = require("express");
 const jwt = require("jsonwebtoken");
-const fs = require("fs");
+const fs = require("fs").promises;
 const path = require("path");
-require('dotenv').config();
+require("dotenv").config();
 const cors = require("cors");
 
 const app = express();
@@ -10,127 +10,180 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-const dataPath = path.join(__dirname, '../data.json');
+const dataPath = path.join(__dirname, "data.json");
 
 async function readData() {
     try {
-        const data = await fs.readFile(dataPath, 'utf8');
-        return JSON.parse(data);
+      const data = await fs.readFile(dataPath, "utf8"); 
+      return JSON.parse(data || '{"users": [], "notes": []}'); 
     } catch (error) {
-        console.error(error);
-        return { users: [], notes: [] };
+      console.error("Error reading data:", error);
+      return { users: [], notes: [] }; 
     }
-}
+  }
 
 async function writeData(data) {
+  try {
     await fs.writeFile(dataPath, JSON.stringify(data, null, 2));
+    return true;
+  } catch (error) {
+    console.error("Error writing data:", error);
+    return false;
+  }
 }
 
-users = []
+users = [];
 
-app.post("/signup", function(req, res){
-    const username = req.body.username;
-    const password = req.body.password;
+app.post("/signup", async function (req, res) {
+  const username = req.body.username;
+  const password = req.body.password;
 
-    users.push({
-        username,
-        password
-    })
+  const data = await readData();
 
-    res.json({
-        msg:"You have signed up"    
-    })
-})
+//   if (data.users.find((user) => user.username === username)) {
+//     return res.status(400).json({ msg: "Username already exists" });
+//   }
 
-app.post("/signin", function(req, res){
-    const username = req.body.username;
-    const password = req.body.password;
+  data.users.push({ username, password });
+//   console.log(data);
+  if (await writeData(data)) {
+    res.json({ msg: "You have signed up" });
+  } else {
+    res.status(500).json({ msg: "Error saving user" });
+  }
+});
 
-    const foundUser = users.find(user => user.username === username && user.password === password);
+app.post("/signin", async (req, res) => {
+  const { username, password } = req.body;
 
-    if(foundUser){
-        const token = jwt.sign({
-            username : username
-        },process.env.JWT_SECRETE);
+  const data = await readData();
 
-        res.json({
-            username: username,
-            token : token
-        })                
-    } else {
-        res.status(403).send({
-            message: "Invalid username or password"
-        })
-    }
-    console.log(users)
-})
+  const foundUser = data.users.find(
+    (user) => user.username === username && user.password === password
+  );
 
-function auth(req, res, next){
+  if (foundUser) {
+    const token = jwt.sign( { username } , process.env.JWT_SECRET);
+    res.json({ username, token });
+  } else {
+    res.status(403).json({ msg: "Invalid username or password" });
+  }
+});
+
+function auth(req, res, next) {
     const token = req.headers.token;
-
-    if(!token){
-        res.json({
-            msg:"Invalid token"
-        })
+  
+    if (!token) {
+      return res.status(401).json({ msg: "Token missing or invalid" });
     }
-
-    const decodedData = jwt.verify(token, process.env.JWT_SECRETE);
-
-    if(decodedData.username){
-        req.username = decodedData.username;
-        next();
-    } else {
-        res.json({
-            msg: "You are not logged in"
-        })
-    }    
+  
+    try {
+      const decodedData = jwt.verify(token, process.env.JWT_SECRET);            
+      req.username = decodedData.username;
+      console.log("req.username in auth middleware:", req.username);
+      next();
+    } catch (error) {
+      console.error("Token verification failed:", error);
+      return res.status(403).json({ msg: "Invalid token" });
+    }
 }
+  
 
+app.get("/me", auth, async function (req, res) {
+  const data = await readData();
+  const foundUser = data.users.find((user) => user.username === req.username);
 
-app.get("/me", auth, function(req, res){
-    let foundUser = users.find(user => user.username === req.username);
+  if (foundUser) {
+    res.json({
+      username: foundUser.username,
+      password: foundUser.password,
+    });
+  } else {
+    res.json({ msg: "Invalid token" });
+  }
+});
 
-    if(foundUser){
-        res.json({
-            username : foundUser.username,
-            password : foundUser.password
-        });
+//save
+
+app.post("/notes", auth, async function (req, res) {
+  const { notesData } = req.body;
+
+  const data = await readData();
+
+  const newNote = {
+    id:
+      data.notes.length > 0 ? Math.max(...data.notes.map((n) => n.id)) + 1 : 1,
+    username: req.username,
+    notesData,
+  };
+//   console.log(newNote.username)
+  data.notes.push(newNote);
+  
+  if (await writeData(data)) {
+    res.status(200).json(newNote);
+  } else {
+    res.status(500).json({ msg: "Error saving note" });
+  }
+});
+
+app.get("/notes", auth, async function (req, res) {
+  const data = await readData();
+
+  const userNotes = data.notes.filter((note) => note.username === req.username);
+
+  if (userNotes.length > 0) {
+    res.json(userNotes);
+  } else {
+    res.json({ msg: "user not found" });
+  }
+});
+
+// update
+app.put("/notes:id", auth, async function (req, res) {
+  const noteId = parseInt(req.params.id);
+  const { notesData } = req.body;
+
+  const data = await readData();
+
+  const noteIndex = data.notes.findIndex(
+    (note) => note.id === noteId && note.username === req.username
+  );
+
+  if (noteIndex !== -1) {
+    data.notes[noteIndex].notesData = notesData;
+
+    if (await writeData(data)) {
+      res.json({ msg: "Note updated successfully" });
     } else {
-        res.json({ msg: "Invalid token"});
+      res.status(500).json({ msg: "Error updating note" });
     }
-})
+  } else {
+    res.status(404).json({ msg: "Note not found" });
+  }
+});
 
-
-app.post("/notes", auth, function(req, res){
-    const notesData = req.body.notesData;
-    idCounter = Math.max(0, ...goals.map((g) => g.id)) + 1;
-    const username = req.body.username;
-
-    const newNotes = {
-        id : idCounter,
-        username : username,
-        notesData : notesData
+app.put("/notes:id", auth, async function (req, res) {
+    const noteId = parseInt(req.params.id);    
+  
+    const data = await readData();
+  
+    const noteToDelete = data.notes.find(
+        (note) => note.id === noteId && note.username === req.username
+    );
+  
+    if (!noteToDelete) {     
+        return res.status(404).json({ msg: "Note not found" });
     }
 
-   if(writeData(newNotes)){
-     res.status(201).json({ id: newNotes.id });
-   } else {
-    res.status(500).json({
-        msg: "error while saving note"
-    })
-   }
+    data.notes = data.notes.filter((note) => note.id !== noteId);
 
-})
+    const success = await writeData(data);
 
-app.get("/notes", auth, function(req, res){
-    const data = readData();
-    if(data.length > 0){
-        res.json(data);
-    } else {
-        res.status(204).json({ msg: "List is empty" });
+    if(success){
+        res.json({ msg: "Note deleted successfully" });
+    }  else {
+        res.status(500).json({ msg: "Error while deleting note" });
     }
-})
-
-
+  });
 
 app.listen(3000);
