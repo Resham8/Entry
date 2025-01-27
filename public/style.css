@@ -309,13 +309,24 @@ body {
 }
 
 .user-info{
+  display: flex;
+  justify-content: space-evenly;
   text-align: center;
-  width: 10vw;  
+  width: 15vw;    
 }
 
 .user-info p {
   color: black;
   font-size: 1.5rem;
+}
+
+.log-out {
+  border-radius: 10px;
+  background-color: white;
+  box-shadow: -3px -3px 4px var(--primary-shadow),
+    3px 3px 4px var(--secondary-shadow);
+  cursor: pointer;
+  padding: .5rem;
 }
 
 @media (max-width: 480px) {
