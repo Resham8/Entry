@@ -49,23 +49,31 @@ function sendSingUpRequest(username, password) {
 }
 
 async function sendSignInRequest(username, password) {
-  axios
-    .post("http://localhost:3000/signin", {
+  try {
+    const response = await axios.post(`${url}/signin`, {
       username: username,
       password: password,
-    })
-    .then((response) => {
-      console.log(response.data);
-      localStorage.setItem("token", response.data.token);
-      localStorage.setItem("username", response.data.username);
-      console.log("Token and username stored successfully!");
-      window.location.href = "dashboard.html";
-    })
-    .catch((error) => {
-      console.error(
-        "Error during login:",
-        error.response?.data || error.message
-      );
-      alert("Login failed. Please check your credentials.");
     });
+
+    if (!response.data.token) {
+      console.error("Token missing in response!");
+      alert("Login failed: Token not received.");
+      return;
+    }
+
+    localStorage.setItem("token", response.data.token);
+    localStorage.setItem("username", response.data.username);
+
+    console.log("Token and username stored successfully!");
+
+    // Use history.pushState to simulate navigation without page reload
+    history.pushState(null, "", "dashboard.html");
+    // loadDashboard(); // Function to load the dashboard content
+  } catch (error) {
+    console.error("Error during login:", error.response?.data || error.message);
+    alert("Login failed. Please check your credentials.");
+  }
 }
+
+
+

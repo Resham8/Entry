@@ -61,16 +61,22 @@ function addNote() {
   wrapper.insertBefore(note, note_add_div);
   
   note_textarea.addEventListener("mouseleave", () => {
-    const textValue = note_textarea.value;
-    console.log(textValue);
+    const textValue = note_textarea.value.trim();
+  
+    if (!textValue) {
+      alert("Note is empty. Please write something before leaving.");
+      return;
+    }
+  
     const textP = document.createElement("p");
     note.appendChild(textP);
     textP.innerText = textValue;
-
-    saveData(textValue);
-
-    note_textarea.remove(); 
+  
+    saveData(textValue); 
+  
+    note_textarea.remove();
   });
+  
 
   penIcon.addEventListener("click", function () {
     editNote();
@@ -84,27 +90,18 @@ function addNote() {
 
 async function saveData(textData) {
   const token = localStorage.getItem("token");
-  console.log("Token from localStorage:", token); // debug token
 
   if (!token) {
     alert("Token is missing. Please log in again.");
     return;
   }
 
-  const noteInput = document.querySelector(".note-input");
-  if (!noteInput) {
-    alert("Note input not found!");
-    return;
-  }
-
-  const noteContent = noteInput.value;
-
   try {
     const response = await axios.post(
       `${url}/notes`,
       {
         username: localStorage.getItem("username"),
-        notesData: noteContent,
+        notesData: textData, 
       },
       {
         headers: {
@@ -114,12 +111,12 @@ async function saveData(textData) {
     );
 
     console.log("Response from server:", response.data);
+    alert("Note saved successfully!");
   } catch (error) {
     console.error("Error saving note:", error.response?.data || error.message);
     alert("Error saving note. Please check the token or contact support.");
   }
 }
-
 
 
 function editNote() {
