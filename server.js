@@ -13,14 +13,14 @@ app.use(cors());
 const dataPath = path.join(__dirname, "data.json");
 
 async function readData() {
-    try {
-      const data = await fs.readFile(dataPath, "utf8"); 
-      return JSON.parse(data || '{"users": [], "notes": []}'); 
-    } catch (error) {
-      console.error("Error reading data:", error);
-      return { users: [], notes: [] }; 
-    }
+  try {
+    const data = await fs.readFile(dataPath, "utf8");
+    return JSON.parse(data || '{"users": [], "notes": []}');
+  } catch (error) {
+    console.error("Error reading data:", error);
+    return { users: [], notes: [] };
   }
+}
 
 async function writeData(data) {
   try {
@@ -32,20 +32,15 @@ async function writeData(data) {
   }
 }
 
-users = [];
-
-app.post("/signup", async function (req, res) {
-  const username = req.body.username;
-  const password = req.body.password;
-
+app.post("/signup", async (req, res) => {
+  const { username, password } = req.body;
   const data = await readData();
-
-//   if (data.users.find((user) => user.username === username)) {
-//     return res.status(400).json({ msg: "Username already exists" });
-//   }
+  
+  // if (data.users.find((user) => user.username === username)) {
+  //   return res.status(400).json({ msg: "Username already exists" });
+  // }
 
   data.users.push({ username, password });
-//   console.log(data);
   if (await writeData(data)) {
     res.json({ msg: "You have signed up" });
   } else {
@@ -55,7 +50,6 @@ app.post("/signup", async function (req, res) {
 
 app.post("/signin", async (req, res) => {
   const { username, password } = req.body;
-
   const data = await readData();
 
   const foundUser = data.users.find(
@@ -63,7 +57,7 @@ app.post("/signin", async (req, res) => {
   );
 
   if (foundUser) {
-    const token = jwt.sign( { username } , process.env.JWT_SECRET);
+    const token = jwt.sign({ username }, process.env.JWT_SECRET);
     res.json({ username, token });
   } else {
     res.status(403).json({ msg: "Invalid username or password" });
@@ -71,28 +65,24 @@ app.post("/signin", async (req, res) => {
 });
 
 function auth(req, res, next) {
-    const token = req.headers.token;
-  
-    if (!token) {
-      return res.status(401).json({ msg: "Token missing or invalid" });
-    }
-  
-    try {
-      const decodedData = jwt.verify(token, process.env.JWT_SECRET);            
-      req.username = decodedData.username;
-      console.log("req.username in auth middleware:", req.username);
-      next();
-    } catch (error) {
-      console.error("Token verification failed:", error);
-      return res.status(403).json({ msg: "Invalid token" });
-    }
+  const token = req.headers.token;
+  if (!token) {
+    return res.status(401).json({ msg: "Token missing or invalid" });
+  }
+  try {
+    const decodedData = jwt.verify(token, process.env.JWT_SECRET);
+    req.username = decodedData.username;
+    console.log("Authenticated user:", req.username);
+    next();
+  } catch (error) {
+    console.error("Token verification failed:", error);
+    return res.status(403).json({ msg: "Invalid token" });
+  }
 }
-  
 
-app.get("/me", auth, async function (req, res) {
+app.get("/me", auth, async (req, res) => {
   const data = await readData();
   const foundUser = data.users.find((user) => user.username === req.username);
-
   if (foundUser) {
     res.json({
       username: foundUser.username,
@@ -103,22 +93,17 @@ app.get("/me", auth, async function (req, res) {
   }
 });
 
-//save
-
-app.post("/notes", auth, async function (req, res) {
+app.post("/notes", auth, async (req, res) => {
   const { notesData } = req.body;
-
   const data = await readData();
 
   const newNote = {
-    id:
-      data.notes.length > 0 ? Math.max(...data.notes.map((n) => n.id)) + 1 : 1,
+    id: data.notes.length > 0 ? Math.max(...data.notes.map((n) => n.id)) + 1 : 1,
     username: req.username,
     notesData,
   };
-//   console.log(newNote.username)
+
   data.notes.push(newNote);
-  
   if (await writeData(data)) {
     res.status(200).json(newNote);
   } else {
@@ -126,23 +111,15 @@ app.post("/notes", auth, async function (req, res) {
   }
 });
 
-app.get("/notes", auth, async function (req, res) {
+app.get("/notes", auth, async (req, res) => {
   const data = await readData();
-
   const userNotes = data.notes.filter((note) => note.username === req.username);
-
-  if (userNotes.length > 0) {
-    res.json(userNotes);
-  } else {
-    res.json({ msg: "user not found" });
-  }
+  res.json(userNotes);
 });
 
-// update
-app.put("/notes:id", auth, async function (req, res) {
+app.put("/notes/:id", auth, async (req, res) => {
   const noteId = parseInt(req.params.id);
   const { notesData } = req.body;
-
   const data = await readData();
 
   const noteIndex = data.notes.findIndex(
@@ -151,7 +128,6 @@ app.put("/notes:id", auth, async function (req, res) {
 
   if (noteIndex !== -1) {
     data.notes[noteIndex].notesData = notesData;
-
     if (await writeData(data)) {
       res.json({ msg: "Note updated successfully" });
     } else {
@@ -162,28 +138,27 @@ app.put("/notes:id", auth, async function (req, res) {
   }
 });
 
-app.put("/notes:id", auth, async function (req, res) {
-    const noteId = parseInt(req.params.id);    
-  
-    const data = await readData();
-  
-    const noteToDelete = data.notes.find(
-        (note) => note.id === noteId && note.username === req.username
-    );
-  
-    if (!noteToDelete) {     
-        return res.status(404).json({ msg: "Note not found" });
-    }
+// Delete a note
+app.delete("/notes/:id", auth, async (req, res) => {
+  const noteId = parseInt(req.params.id);
+  const data = await readData();
 
-    data.notes = data.notes.filter((note) => note.id !== noteId);
+  const noteIndex = data.notes.findIndex(
+    (note) => note.id === noteId && note.username === req.username
+  );
 
-    const success = await writeData(data);
+  if (noteIndex === -1) {
+    return res.status(404).json({ msg: "Note not found" });
+  }
 
-    if(success){
-        res.json({ msg: "Note deleted successfully" });
-    }  else {
-        res.status(500).json({ msg: "Error while deleting note" });
-    }
-  });
+  data.notes.splice(noteIndex, 1);
+  if (await writeData(data)) {
+    res.json({ msg: "Note deleted successfully" });
+  } else {
+    res.status(500).json({ msg: "Error while deleting note" });
+  }
+});
 
-app.listen(3000);
+app.listen(3000, () => {
+  console.log("Server listening on port 3000");
+});

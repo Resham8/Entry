@@ -66,9 +66,11 @@ async function sendSignInRequest(username, password) {
 
     console.log("Token and username stored successfully!");
 
-    // Use history.pushState to simulate navigation without page reload
-    history.pushState(null, "", "dashboard.html");
-    // loadDashboard(); // Function to load the dashboard content
+    setTimeout(() => {
+      window.location.href = "dashboard.html";
+    }, 100);
+    
+
   } catch (error) {
     console.error("Error during login:", error.response?.data || error.message);
     alert("Login failed. Please check your credentials.");
