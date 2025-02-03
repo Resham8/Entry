@@ -2,48 +2,31 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Register</title>
-    <link rel="stylesheet" href="style.css" />
-    <script src="auth.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Register | Entry</title>
+    <link rel="stylesheet" href="style.css" />    
+    <script src="auth.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js" defer></script>
   </head>
   <body>
     <div class="auth-container">
       <div class="credentials">
-        <h2>Sign Up</h2>
-
+        <h2 id="auth-heading">Sign Up</h2>
         <div class="form-group">
           <label for="username">Username</label>
-          <input
-            type="text"
-            id="username"
-            class="form-input"
-            placeholder="Enter username"
-            aria-required="true"
-            minlength="3"
-          />          
+          <input type="text" id="username" class="form-input" placeholder="Enter username" required minlength="3" />
         </div>
-
         <div class="form-group">
           <label for="password">Password</label>
-          <input
-            type="password"
-            id="password"
-            class="form-input"
-            placeholder="Enter password"
-            aria-required="true"
-            minlength="8"
-          />      
+          <input type="password" id="password" class="form-input" placeholder="Enter password" required minlength="8" />
         </div>
-
-        <button class="submit-btn" onclick="authentication();">
+        <button class="submit-btn" id="auth-btn">
           <span id="auth-mode-label">Sign Up</span>
         </button>
-        <button class="toggle-auth-mode-btn submit-btn" onclick="toggleAuthMode();">
+        <button class="toggle-auth-mode-btn submit-btn" id="toggle-auth">
           Switch to Sign In
         </button>
       </div>
-    </div>
+    </div>   
   </body>
 </html>
